@@ -1,67 +1,36 @@
-﻿# HanVerse — AI Chinese Pronunciation Evaluation Engine
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-AI-powered Chinese speaking evaluation and scoring engine.
-Users record speech → AI scores pronunciation/tone/fluency → HSK/CEFR report → practice weak points.
+## Getting Started
 
-## Architecture
-
-```
-Next.js 14 (Frontend) → NestJS API → Redis Queue (BullMQ) → Python AI Worker
-                                                                    ↓
-                                                          Whisper + Scoring Engine + GPT
-```
-
-## Project Structure
-
-```
-language education app/          ← Main repo (contracts + infra)
-├── contracts/                   ← Shared API contracts + DB schema
-├── docker/                      ← Docker Compose for local dev
-├── .codex/                      ← Codex automations
-└── .github/workflows/           ← CI/CD
-
-hanverse-worktrees/              ← Parallel development streams
-├── frontend/                    ← Next.js 14 (codex/hanverse-frontend)
-├── backend/                     ← NestJS API (codex/hanverse-backend)
-├── ai-worker/                   ← Python Worker (codex/hanverse-ai-worker)
-├── database/                    ← SQL + Migrations (codex/hanverse-database)
-└── infra/                       ← DevOps (codex/hanverse-infra)
-```
-
-## Quick Start
+First, run the development server:
 
 ```bash
-# Start all services
-cd docker
-docker compose up -d
-
-# Frontend: http://localhost:3001
-# Backend:  http://localhost:3000
-# Redis:    localhost:6379
-# Postgres: localhost:5432
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-## Development Streams
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-| Stream | Branch | Tech | Key Files |
-|--------|--------|------|-----------|
-| Frontend | `codex/hanverse-frontend` | Next.js 14 + TypeScript + Tailwind | `hanverse-worktrees/frontend/` |
-| Backend | `codex/hanverse-backend` | NestJS + BullMQ + Prisma | `hanverse-worktrees/backend/` |
-| AI Worker | `codex/hanverse-ai-worker` | Python + librosa + Redis | `hanverse-worktrees/ai-worker/` |
-| Database | `codex/hanverse-database` | PostgreSQL SQL | `hanverse-worktrees/database/` |
-| Infra | `codex/hanverse-infra` | Docker + CI/CD | `hanverse-worktrees/infra/` |
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## API Contract
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-See `contracts/api-contract.yaml` for the full Frontend ↔ Backend interface.
-See `contracts/ai-worker-contract.yaml` for the Backend ↔ AI Worker interface.
+## Learn More
 
-## Pricing
+To learn more about Next.js, take a look at the following resources:
 
-Per-assessment pricing (no subscription):
-- Free: 1 assessment/day
-- Single: $0.99
-- 5-Pack: $3.99
-- 10-Pack: $7.99
-- 30-Pack: $19.99
-- 100-Pack: $49.99
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
