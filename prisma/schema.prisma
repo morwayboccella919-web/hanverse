@@ -1,0 +1,166 @@
+﻿generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String       @id @default(uuid()) @db.Uuid
+  email            String?      @unique @db.VarChar(255)
+  wechatOpenid     String?      @unique @map("wechat_openid") @db.VarChar(128)
+  displayName      String       @map("display_name") @db.VarChar(128)
+  passwordHash     String?      @map("password_hash") @db.VarChar(255)
+  hskLevel         Int          @default(1) @map("hsk_level")
+  creditsRemaining Int          @default(1) @map("credits_remaining")
+  streakDays       Int          @default(0) @map("streak_days")
+  maxStreak        Int          @default(0) @map("max_streak")
+  lastActiveDate   DateTime?    @map("last_active_date") @db.Date
+  totalXp          Int          @default(0) @map("total_xp")
+  createdAt        DateTime     @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt        DateTime     @updatedAt @map("updated_at") @db.Timestamptz()
+
+  assessments Assessment[]
+  practices   Practice[]
+  orders      Order[]
+  shareCards  ShareCard[]
+  auditLogs   AuditLog[]
+
+  @@index([email])
+  @@index([lastActiveDate])
+  @@map("users")
+}
+
+model Question {
+  id               String   @id @default(uuid()) @db.Uuid
+  text             String   @db.Text
+  pinyin           String   @db.Text
+  hskLevel         Int      @map("hsk_level")
+  category         String   @default("daily") @db.VarChar(64)
+  syllableCount    Int      @map("syllable_count")
+  toneDistribution Json?    @map("tone_distribution") @db.JsonB
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  assessments Assessment[]
+
+  @@index([hskLevel])
+  @@index([category])
+  @@map("questions")
+}
+
+enum AssessmentStatus {
+  pending
+  processing
+  done
+  failed
+}
+
+model Assessment {
+  id                   String           @id @default(uuid()) @db.Uuid
+  userId               String           @map("user_id") @db.Uuid
+  questionId           String           @map("question_id") @db.Uuid
+  referenceText        String           @map("reference_text") @db.Text
+  referencePinyin      String           @map("reference_pinyin") @db.Text
+  audioUrl             String?          @map("audio_url") @db.VarChar(1024)
+  status               AssessmentStatus @default(pending)
+  pronunciationScore   Decimal?         @map("pronunciation_score") @db.Decimal(5, 2)
+  toneScore            Decimal?         @map("tone_score") @db.Decimal(5, 2)
+  fluencyScore         Decimal?         @map("fluency_score") @db.Decimal(5, 2)
+  overallScore         Decimal?         @map("overall_score") @db.Decimal(5, 2)
+  hskEstimate          String?          @map("hsk_estimate") @db.VarChar(8)
+  cefrEstimate         String?          @map("cefr_estimate") @db.VarChar(4)
+  errorPhonemes        Json?            @map("error_phonemes") @db.JsonB
+  explanation          String?          @db.Text
+  reportData           Json?            @map("report_data") @db.JsonB
+  processingDurationMs Int?             @map("processing_duration_ms")
+  createdAt            DateTime         @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt            DateTime         @updatedAt @map("updated_at") @db.Timestamptz()
+
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question  Question    @relation(fields: [questionId], references: [id])
+  practices Practice[]
+  shareCards ShareCard[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("assessments")
+}
+
+model Practice {
+  id            String    @id @default(uuid()) @db.Uuid
+  userId        String    @map("user_id") @db.Uuid
+  assessmentId  String    @map("assessment_id") @db.Uuid
+  tasks         Json      @db.JsonB
+  scores        Json?     @db.JsonB
+  completed     Boolean   @default(false)
+  xpEarned      Int       @default(0) @map("xp_earned")
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assessment Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([assessmentId])
+  @@map("practices")
+}
+
+enum OrderStatus {
+  pending
+  paid
+  failed
+  refunded
+}
+
+model Order {
+  id              String      @id @default(uuid()) @db.Uuid
+  userId          String      @map("user_id") @db.Uuid
+  stripeSessionId String?     @unique @map("stripe_session_id") @db.VarChar(255)
+  amountCents     Int         @map("amount_cents")
+  currency        String      @default("usd") @db.VarChar(3)
+  package         String      @db.VarChar(32)
+  creditsPurchased Int        @map("credits_purchased")
+  status          OrderStatus @default(pending)
+  createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt       DateTime    @updatedAt @map("updated_at") @db.Timestamptz()
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([stripeSessionId])
+  @@map("orders")
+}
+
+model ShareCard {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @map("user_id") @db.Uuid
+  assessmentId String   @map("assessment_id") @db.Uuid
+  imageUrl     String?  @map("image_url") @db.VarChar(1024)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assessment Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("share_cards")
+}
+
+model AuditLog {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String?  @map("user_id") @db.Uuid
+  action       String   @db.VarChar(128)
+  resourceType String?  @map("resource_type") @db.VarChar(64)
+  resourceId   String?  @map("resource_id") @db.Uuid
+  details      Json?    @db.JsonB
+  ipAddress    String?  @map("ip_address") @db.VarChar(45)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([createdAt(sort: Desc)])
+  @@map("audit_logs")
+}

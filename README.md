@@ -1,67 +1,98 @@
-﻿# HanVerse — AI Chinese Pronunciation Evaluation Engine
+<p align="center">
+  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+</p>
 
-AI-powered Chinese speaking evaluation and scoring engine.
-Users record speech → AI scores pronunciation/tone/fluency → HSK/CEFR report → practice weak points.
+[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
+[circleci-url]: https://circleci.com/gh/nestjs/nest
 
-## Architecture
+  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
+    <p align="center">
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
+<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
+<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
+<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
+<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
+<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
+  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
+    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
+  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
+</p>
+  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
+  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-```
-Next.js 14 (Frontend) → NestJS API → Redis Queue (BullMQ) → Python AI Worker
-                                                                    ↓
-                                                          Whisper + Scoring Engine + GPT
-```
+## Description
 
-## Project Structure
+[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-```
-language education app/          ← Main repo (contracts + infra)
-├── contracts/                   ← Shared API contracts + DB schema
-├── docker/                      ← Docker Compose for local dev
-├── .codex/                      ← Codex automations
-└── .github/workflows/           ← CI/CD
-
-hanverse-worktrees/              ← Parallel development streams
-├── frontend/                    ← Next.js 14 (codex/hanverse-frontend)
-├── backend/                     ← NestJS API (codex/hanverse-backend)
-├── ai-worker/                   ← Python Worker (codex/hanverse-ai-worker)
-├── database/                    ← SQL + Migrations (codex/hanverse-database)
-└── infra/                       ← DevOps (codex/hanverse-infra)
-```
-
-## Quick Start
+## Project setup
 
 ```bash
-# Start all services
-cd docker
-docker compose up -d
-
-# Frontend: http://localhost:3001
-# Backend:  http://localhost:3000
-# Redis:    localhost:6379
-# Postgres: localhost:5432
+$ npm install
 ```
 
-## Development Streams
+## Compile and run the project
 
-| Stream | Branch | Tech | Key Files |
-|--------|--------|------|-----------|
-| Frontend | `codex/hanverse-frontend` | Next.js 14 + TypeScript + Tailwind | `hanverse-worktrees/frontend/` |
-| Backend | `codex/hanverse-backend` | NestJS + BullMQ + Prisma | `hanverse-worktrees/backend/` |
-| AI Worker | `codex/hanverse-ai-worker` | Python + librosa + Redis | `hanverse-worktrees/ai-worker/` |
-| Database | `codex/hanverse-database` | PostgreSQL SQL | `hanverse-worktrees/database/` |
-| Infra | `codex/hanverse-infra` | Docker + CI/CD | `hanverse-worktrees/infra/` |
+```bash
+# development
+$ npm run start
 
-## API Contract
+# watch mode
+$ npm run start:dev
 
-See `contracts/api-contract.yaml` for the full Frontend ↔ Backend interface.
-See `contracts/ai-worker-contract.yaml` for the Backend ↔ AI Worker interface.
+# production mode
+$ npm run start:prod
+```
 
-## Pricing
+## Run tests
 
-Per-assessment pricing (no subscription):
-- Free: 1 assessment/day
-- Single: $0.99
-- 5-Pack: $3.99
-- 10-Pack: $7.99
-- 30-Pack: $19.99
-- 100-Pack: $49.99
+```bash
+# unit tests
+$ npm run test
+
+# e2e tests
+$ npm run test:e2e
+
+# test coverage
+$ npm run test:cov
+```
+
+## Deployment
+
+When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+
+If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+
+```bash
+$ npm install -g @nestjs/mau
+$ mau deploy
+```
+
+With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+
+## Resources
+
+Check out a few resources that may come in handy when working with NestJS:
+
+- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
+- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
+- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
+- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
+- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
+- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
+- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
+- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+
+## Support
+
+Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+
+## Stay in touch
+
+- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
+- Website - [https://nestjs.com](https://nestjs.com/)
+- Twitter - [@nestframework](https://twitter.com/nestframework)
+
+## License
+
+Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).

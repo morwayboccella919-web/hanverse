@@ -36,3 +36,5 @@ docker/.env
 
 # Logs
 *.log
+
+/generated/prisma
