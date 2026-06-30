@@ -1,0 +1,8 @@
+#!/bin/sh
+# HanVerse post-commit hook: Feishu notify + auto-push
+
+# 1. Feishu notification
+powershell.exe -NoProfile -File "C:/Users/Administrator/Documents/language education app/.codex/notify-commit.ps1"
+
+# 2. Auto-push to GitHub (silent if blocked)
+git push origin HEAD 2>/dev/null || true
