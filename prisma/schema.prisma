@@ -1,26 +1,40 @@
-﻿generator client {
+generator client {
   provider = "prisma-client-js"
+  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+}
+
+enum AssessmentStatus {
+  pending
+  processing
+  done
+  failed
+}
+
+enum OrderStatus {
+  pending
+  paid
+  failed
+  refunded
 }
 
 model User {
-  id               String       @id @default(uuid()) @db.Uuid
-  email            String?      @unique @db.VarChar(255)
-  wechatOpenid     String?      @unique @map("wechat_openid") @db.VarChar(128)
-  displayName      String       @map("display_name") @db.VarChar(128)
-  passwordHash     String?      @map("password_hash") @db.VarChar(255)
-  hskLevel         Int          @default(1) @map("hsk_level")
-  creditsRemaining Int          @default(1) @map("credits_remaining")
-  streakDays       Int          @default(0) @map("streak_days")
-  maxStreak        Int          @default(0) @map("max_streak")
-  lastActiveDate   DateTime?    @map("last_active_date") @db.Date
-  totalXp          Int          @default(0) @map("total_xp")
-  createdAt        DateTime     @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt        DateTime     @updatedAt @map("updated_at") @db.Timestamptz()
+  id               String           @id @default(uuid()) @db.Uuid
+  email            String?          @unique @db.VarChar(255)
+  wechatOpenid     String?          @unique @map("wechat_openid") @db.VarChar(128)
+  displayName      String           @map("display_name") @db.VarChar(128)
+  passwordHash     String?          @map("password_hash") @db.VarChar(255)
+  hskLevel         Int              @default(1) @map("hsk_level")
+  creditsRemaining Int              @default(1) @map("credits_remaining")
+  streakDays       Int              @default(0) @map("streak_days")
+  maxStreak        Int              @default(0) @map("max_streak")
+  lastActiveDate   DateTime?        @map("last_active_date") @db.Date
+  totalXp          Int              @default(0) @map("total_xp")
+  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt        DateTime         @updatedAt @map("updated_at") @db.Timestamptz()
 
   assessments Assessment[]
   practices   Practice[]
@@ -50,13 +64,6 @@ model Question {
   @@map("questions")
 }
 
-enum AssessmentStatus {
-  pending
-  processing
-  done
-  failed
-}
-
 model Assessment {
   id                   String           @id @default(uuid()) @db.Uuid
   userId               String           @map("user_id") @db.Uuid
@@ -78,9 +85,9 @@ model Assessment {
   createdAt            DateTime         @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt            DateTime         @updatedAt @map("updated_at") @db.Timestamptz()
 
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  question  Question    @relation(fields: [questionId], references: [id])
-  practices Practice[]
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question   Question    @relation(fields: [questionId], references: [id])
+  practices  Practice[]
   shareCards ShareCard[]
 
   @@index([userId])
@@ -108,24 +115,17 @@ model Practice {
   @@map("practices")
 }
 
-enum OrderStatus {
-  pending
-  paid
-  failed
-  refunded
-}
-
 model Order {
-  id              String      @id @default(uuid()) @db.Uuid
-  userId          String      @map("user_id") @db.Uuid
-  stripeSessionId String?     @unique @map("stripe_session_id") @db.VarChar(255)
-  amountCents     Int         @map("amount_cents")
-  currency        String      @default("usd") @db.VarChar(3)
-  package         String      @db.VarChar(32)
-  creditsPurchased Int        @map("credits_purchased")
-  status          OrderStatus @default(pending)
-  createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt       DateTime    @updatedAt @map("updated_at") @db.Timestamptz()
+  id               String      @id @default(uuid()) @db.Uuid
+  userId           String      @map("user_id") @db.Uuid
+  stripeSessionId  String?     @unique @map("stripe_session_id") @db.VarChar(255)
+  amountCents      Int         @map("amount_cents")
+  currency         String      @default("usd") @db.VarChar(3)
+  package          String      @db.VarChar(32)
+  creditsPurchased Int         @map("credits_purchased")
+  status           OrderStatus @default(pending)
+  createdAt        DateTime    @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt        DateTime    @updatedAt @map("updated_at") @db.Timestamptz()
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
