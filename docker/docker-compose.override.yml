@@ -1,0 +1,45 @@
+﻿# ============================================================
+# HanVerse Local Dev Overrides
+# Docker Compose auto-merges this with docker-compose.yml
+# ============================================================
+
+services:
+  postgres:
+    # Expose on a different port to avoid conflicts with local PG
+    # ports already defined in base; override requires redeclaring
+    ports:
+      - "5432:5432"
+    # Stricter health for dev (wider retries)
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hanverse"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    ports:
+      - "6379:6379"
+
+  backend:
+    ports:
+      - "3000:3000"
+      # Node.js debugger port
+      - "9229:9229"
+    environment:
+      # Verbose logging in dev
+      LOG_LEVEL: debug
+      # BullMQ UI (dev only)
+      BULL_BOARD_ENABLED: "true"
+    # Hot-reload: watch entire src tree
+    volumes:
+      - ../../backend/src:/app/src
+      - ../../backend/package.json:/app/package.json
+
+  ai-worker:
+    environment:
+      LOG_LEVEL: debug
+      # Retry failed jobs quicker in dev
+      JOB_RETRY_DELAY_MS: "1000"
+    volumes:
+      - ../../ai-worker/src:/app/src
+      - ../../ai-worker/requirements.txt:/app/requirements.txt
