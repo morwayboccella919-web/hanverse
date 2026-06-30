@@ -1,0 +1,58 @@
+﻿# HanVerse AI Worker Contract v1.0
+# Backend ↔ Python Worker interface definition
+# Communication via Redis Queue (BullMQ)
+
+# ===== Assessment Job =====
+# Backend pushes this to Redis Queue "assessment:queue"
+# Python Worker consumes and processes
+assessment_job:
+  queue: "assessment:queue"
+  input:
+    assessment_id: string
+    audio_url: string          # Cloudflare R2 presigned URL
+    question_id: string
+    reference_text: string     # The sentence user was supposed to read
+    reference_pinyin: string   # Pinyin of reference_text
+  output:                       # Written to PostgreSQL assessments table
+    status: "done" | "failed"
+    pronunciation_score: number
+    tone_score: number
+    fluency_score: number
+    overall_score: number
+    hsk_estimate: string        # e.g. "HSK3"
+    cefr_estimate: string       # e.g. "B1"
+    error_phonemes:
+      tone:                     # Tone errors
+        - syllable: string
+          expected: string      # "1st"|"2nd"|"3rd"|"4th"|"neutral"
+          actual: string
+      pronunciation:            # Phoneme errors
+        - syllable: string
+          phoneme: string
+          type: "substitution" | "deletion" | "insertion"
+          detail: string
+    explanation: string          # GPT-generated natural language explanation
+    report_data:
+      tone_heatmap: object
+      fluency_detail:
+        speech_rate_wpm: number
+        pause_count: number
+        avg_pause_ms: number
+      suggestions: string[]
+
+# ===== Practice Job =====
+# Backend pushes when user clicks "练习我的错误"
+# Python Worker generates practice tasks from error list
+practice_job:
+  queue: "practice:queue"
+  input:
+    assessment_id: string
+    error_phonemes: object     # Same structure as above
+    reference_text: string
+  output:                       # Written to PostgreSQL practices table
+    tasks:
+      - type: "discrimination" | "shadowing" | "fluency"
+        instruction: string
+        options?: string[]      # For discrimination tasks
+        answer?: string          # Correct answer
+        syllable?: string        # Target syllable for shadowing

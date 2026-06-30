@@ -1,0 +1,141 @@
+﻿# HanVerse API Contract v1.0
+# Frontend ↔ Backend interface definition
+# Frontend mocks from this, Backend implements to this
+
+endpoints:
+  # ===== Auth =====
+  POST /api/auth/login:
+    input:
+      email: string
+      password?: string
+    output:
+      access_token: string
+      user: User
+
+  GET /api/auth/me:
+    output: User
+
+  # ===== Question Bank =====
+  GET /api/questions:
+    query:
+      hsk?: number
+      category?: string
+    output: Question[]
+
+  GET /api/questions/:id:
+    output: Question
+
+  # ===== Assessments =====
+  POST /api/assessments:
+    input:
+      audio: File
+      question_id: string
+    output:
+      assessment_id: string
+
+  GET /api/assessments/:id:
+    output: AssessmentStatus
+
+  GET /api/assessments/:id/report:
+    output: AssessmentReport
+
+  GET /api/assessments/history:
+    output: AssessmentSummary[]
+
+  # ===== Practice =====
+  POST /api/practice/generate:
+    input:
+      assessment_id: string
+    output:
+      practice_id: string
+
+  GET /api/practice/:id:
+    output: PracticeDetail
+
+  POST /api/practice/:id/submit/:task_index:
+    input:
+      answer: any
+    output:
+      correct: boolean
+      feedback: string
+
+  GET /api/practice/:id/result:
+    output: PracticeResult
+
+  # ===== Payment =====
+  POST /api/payments/create:
+    input:
+      package: "single" | "5pack" | "10pack" | "30pack" | "100pack"
+    output:
+      stripe_session_url: string
+
+  # ===== Share =====
+  POST /api/share/generate:
+    input:
+      assessment_id: string
+    output:
+      image_url: string
+
+# ===== Shared Types =====
+types:
+  User:
+    id: string
+    email: string
+    display_name: string
+    hsk_level: number
+    credits_remaining: number
+    streak_days: number
+    max_streak: number
+    last_active_date: string
+    total_xp: number
+    created_at: string
+
+  Question:
+    id: string
+    text: string
+    pinyin: string
+    hsk_level: number
+    category: string
+    syllable_count: number
+
+  AssessmentStatus:
+    id: string
+    status: "pending" | "processing" | "done" | "failed"
+    overall?: number
+    hsk_estimate?: string
+    created_at: string
+
+  AssessmentReport:
+    id: string
+    status: string
+    pronunciation_score: number
+    tone_score: number
+    fluency_score: number
+    overall_score: number
+    hsk_estimate: string
+    cefr_estimate: string
+    error_phonemes: object
+    explanation: string
+    report_data: object
+    created_at: string
+
+  AssessmentSummary:
+    id: string
+    overall_score: number
+    hsk_estimate: string
+    created_at: string
+
+  PracticeDetail:
+    id: string
+    tasks: Task[]
+    completed: boolean
+
+  Task:
+    type: "discrimination" | "shadowing" | "fluency"
+    instruction: string
+    options?: string[]
+    answer?: string
+
+  PracticeResult:
+    scores: number[]
+    xp_earned: number
